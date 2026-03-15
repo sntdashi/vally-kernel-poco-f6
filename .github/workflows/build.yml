@@ -22,9 +22,13 @@ jobs:
       run: |
         git clone https://github.com/osm0sis/AnyKernel3
 
+    - name: Fix script format
+      run: |
+        sudo apt install -y dos2unix
+        dos2unix scripts/build.sh
+    
     - name: Run build script
       run: |
-        dos2unix scripts/build.sh || true
         chmod +x scripts/build.sh
         bash scripts/build.sh
 
