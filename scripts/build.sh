@@ -21,6 +21,10 @@ echo "===== INJECT KERNELSU NEXT ====="
 git clone --depth=1 https://github.com/KernelSU-Next/KernelSU-Next ksu
 bash ksu/kernel/setup.sh
 
+echo "===== FIX XIAOMI HWID KCONFIG ====="
+sed -i '/hwid\/Kconfig/d' drivers/misc/Kconfig || true
+sed -i '/hwid/d' drivers/misc/Makefile || true
+
 CONF=arch/arm64/configs/vendor/pineapple_defconfig
 
 echo "===== ENABLE FEATURES ====="
