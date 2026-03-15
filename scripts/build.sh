@@ -12,7 +12,7 @@ echo "===== CLONE KERNEL SOURCE ====="
 git clone --depth=1 https://github.com/MiCode/Xiaomi_Kernel_OpenSource -b peridot-u-oss kernel
 
 echo "===== CLONE CLANG TOOLCHAIN ====="
-git clone --depth=1 https://github.com/Neutron-Toolchains/clang clang
+git clone --depth=1 https://github.com/kdrag0n/proton-clang clang
 
 export PATH="$WORKDIR/clang/bin:$PATH"
 
@@ -53,7 +53,7 @@ scripts/config --file out/.config \
 
 echo "===== BUILD KERNEL ====="
 
-make -j$(nproc) O=out \
+make -j$(nproc --all) O=out \
 ARCH=arm64 \
 CC=clang \
 LD=ld.lld \
