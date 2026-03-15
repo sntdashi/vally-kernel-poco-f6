@@ -1,40 +1,39 @@
-#!/bin/bash
+name: Poco F6 HyperKernel
 
-set -e
+on:
+  workflow_dispatch:
 
-export ARCH=arm64
-export SUBARCH=arm64
+jobs:
+  build:
 
-echo "Clone Poco F6 kernel source"
-git clone --depth=1 https://github.com/MiCode/Xiaomi_Kernel_OpenSource -b peridot-u-oss kernel
+    runs-on: ubuntu-latest
 
-echo "Clone clang toolchain"
-git clone --depth=1 https://github.com/ZyCromerZ/Clang clang
+    steps:
 
-cd kernel
+    - name: Checkout
+      uses: actions/checkout@v4
 
-echo "Inject KernelSU Next"
-curl -LSs https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/main/kernel/setup.sh | bash
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y bc bison build-essential flex git libssl-dev libelf-dev curl zip
 
-CONF=arch/arm64/configs/vendor/pineapple_defconfig
+    - name: Clone AnyKernel
+      run: |
+        git clone https://github.com/osm0sis/AnyKernel3
 
-echo "Enable virtualization"
-cat <<EOF >> $CONF
-CONFIG_KVM=y
-CONFIG_KVM_ARM_HOST=y
-CONFIG_VIRTUALIZATION=y
-CONFIG_VHOST_NET=y
-CONFIG_VSOCKETS=y
-CONFIG_VIRTIO=y
-CONFIG_OVERLAY_FS=y
-CONFIG_TMPFS_XATTR=y
-CONFIG_ANDROID_BINDERFS=y
-CONFIG_WIREGUARD=y
-EOF
+    - name: Run build script
+      run: |
+        chmod +x scripts/build.sh
+        ./scripts/build.sh
 
-export PATH=$GITHUB_WORKSPACE/clang/bin:$PATH
+    - name: Pack flashable zip
+      run: |
+        cd AnyKernel3
+        zip -r PocoF6-HyperKernel.zip *
 
-make O=out vendor/pineapple_defconfig
-make -j$(nproc) O=out CC=clang LLVM=1 LLVM_IAS=1
-
-cp out/arch/arm64/boot/Image ../../AnyKernel3/Image
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: PocoF6-HyperKernel
+        path: AnyKernel3/PocoF6-HyperKernel.zip
