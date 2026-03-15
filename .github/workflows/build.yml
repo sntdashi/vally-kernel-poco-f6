@@ -24,8 +24,9 @@ jobs:
 
     - name: Run build script
       run: |
+        dos2unix scripts/build.sh || true
         chmod +x scripts/build.sh
-        ./scripts/build.sh
+        bash scripts/build.sh
 
     - name: Pack flashable zip
       run: |
