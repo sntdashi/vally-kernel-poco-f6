@@ -13,32 +13,22 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Install dependencies
+    - name: Install packages
       run: |
         sudo apt update
-        sudo apt install -y bc bison build-essential flex git libssl-dev libelf-dev curl zip
-
-    - name: Clone AnyKernel
-      run: |
-        git clone https://github.com/osm0sis/AnyKernel3
+        sudo apt install -y bc bison build-essential flex git libssl-dev libelf-dev curl zip dos2unix
 
     - name: Fix script format
       run: |
-        sudo apt install -y dos2unix
         dos2unix scripts/build.sh
-    
-    - name: Run build script
+
+    - name: Run build
       run: |
         chmod +x scripts/build.sh
         bash scripts/build.sh
 
-    - name: Pack flashable zip
-      run: |
-        cd AnyKernel3
-        zip -r PocoF6-HyperKernel.zip *
-
-    - name: Upload artifact
+    - name: Upload kernel
       uses: actions/upload-artifact@v4
       with:
         name: PocoF6-HyperKernel
-        path: AnyKernel3/PocoF6-HyperKernel.zip
+        path: AnyKernel/PocoF6-HyperKernel.zip
