@@ -71,8 +71,8 @@ cd ..
 echo "===== CLONE ANYKERNEL ====="
 git clone https://github.com/osm0sis/AnyKernel3 AnyKernel
 
-echo "===== COPY BOOT IMAGE ====="
-cp boot-tools/boot.img AnyKernel/
+echo "===== COPY KERNEL IMAGE ====="
+cp kernel/out/arch/arm64/boot/Image.gz AnyKernel/
 
 echo "===== CREATE FLASHABLE ZIP ====="
 cd AnyKernel
