@@ -19,8 +19,9 @@ cd kernel
 echo "===== CLONE CLANG TOOLCHAIN ====="
 git clone --depth=1 https://github.com/ZyCromerZ/Clang clang
 
-export PATH="$(pwd)/clang/bin:$PATH"
-
+# aktifkan toolchain
+export CLANG_PATH="$(pwd)/clang"
+export PATH="$CLANG_PATH/bin:$PATH"
 # hapus linker konflik
 rm -f clang/bin/ld || true
 
