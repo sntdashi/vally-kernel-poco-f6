@@ -1,71 +1,34 @@
-name: Build Poco F6 Kernel
+name: Poco F6 HyperKernel
 
 on:
-  workflow_dispatch:
+workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+build:
 
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+runs-on: ubuntu-latest  
 
-    - name: Install Dependencies
-      run: |
-        sudo apt update
-        sudo apt install -y git zip bc bison flex libssl-dev make clang lld pahole
+steps:  
 
-    - name: Clone Kernel Source
-      run: |
-        git clone https://github.com/vally-kernel-poco-f6/kernel.git kernel
-        cd kernel
+- name: Checkout  
+  uses: actions/checkout@v4  
 
-    - name: Inject KernelSU Next
-      run: |
-        cd kernel
-        git clone --depth=1 https://github.com/KernelSU-Next/KernelSU-Next ksu
-        bash ksu/kernel/setup.sh
+- name: Install packages  
+  run: |  
+    sudo apt update  
+    sudo apt install -y bc bison build-essential flex git libssl-dev libelf-dev curl zip dos2unix  
 
-    - name: Fix Xiaomi Source Bug
-      run: |
-        cd kernel
-        sed -i '/hwid\/Kconfig/d' drivers/misc/Kconfig || true
-        sed -i '/hwid/d' drivers/misc/Makefile || true
+- name: Fix script format  
+  run: |  
+    dos2unix scripts/build.sh  
 
-    - name: Setup Clang
-      run: |
-        git clone --depth=1 https://github.com/Neutron-Toolchains/clang clang
+- name: Run build  
+  run: |  
+    chmod +x scripts/build.sh  
+    bash scripts/build.sh  
 
-    - name: Build Kernel
-      run: |
-        cd kernel
-        export PATH=$GITHUB_WORKSPACE/clang/bin:$PATH
-
-        make O=out ARCH=arm64 gki_defconfig
-
-        scripts/config --file out/.config -d CONFIG_DEBUG_INFO_BTF
-        scripts/config --file out/.config -d CONFIG_DEBUG_INFO_BTF_MODULES
-
-        make O=out ARCH=arm64 olddefconfig
-
-        make -j$(nproc) O=out ARCH=arm64 \
-        CC=clang \
-        LD=ld.lld \
-        CLANG_TRIPLE=aarch64-linux-gnu- \
-        CROSS_COMPILE=aarch64-linux-gnu- \
-        KCFLAGS="-Wno-frame-larger-than="
-
-    - name: Create AnyKernel Flashable
-      run: |
-        git clone https://github.com/osm0sis/AnyKernel3 AnyKernel
-        cp kernel/out/arch/arm64/boot/Image.gz AnyKernel/
-
-        cd AnyKernel
-        zip -r PocoF6-HyperKernel.zip *
-
-    - name: Upload Kernel
-      uses: actions/upload-artifact@v4
-      with:
-        name: PocoF6-HyperKernel
-        path: AnyKernel/PocoF6-HyperKernel.zip
+- name: Upload kernel  
+  uses: actions/upload-artifact@v4  
+  with:  
+    name: PocoF6-HyperKernel  
+    path: AnyKernel/PocoF6-HyperKernel.zip
