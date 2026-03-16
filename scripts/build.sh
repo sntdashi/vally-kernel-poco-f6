@@ -68,20 +68,6 @@ KCFLAGS="-Wno-frame-larger-than"
 
 cd ..
 
-echo "===== INSTALL MKBOOTIMG ====="
-sudo apt install -y android-sdk-libsparse-utils
-
-echo "===== BUILD BOOT IMAGE ====="
-
-mkbootimg \
---kernel kernel/out/arch/arm64/boot/Image.gz \
---pagesize 4096 \
---base 0x00000000 \
---cmdline "console=ttyMSM0,115200n8" \
--o boot.img
-
-cd ..
-
 echo "===== CLONE ANYKERNEL ====="
 git clone https://github.com/osm0sis/AnyKernel3 AnyKernel
 
