@@ -63,7 +63,8 @@ make -j$(nproc) O=out \
 ARCH=arm64 \
 LLVM=1 \
 LLVM_IAS=1 \
-LOCALVERSION=$KERNEL_NAME
+LOCALVERSION=$KERNEL_NAME \
+KCFLAGS="-Wno-frame-larger-than"
 
 cd ..
 
