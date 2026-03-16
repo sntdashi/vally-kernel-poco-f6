@@ -34,8 +34,8 @@ echo "===== FIX XIAOMI SOURCE BUG ====="
 sed -i '/hwid\/Kconfig/d' drivers/misc/Kconfig || true
 sed -i '/hwid/d' drivers/misc/Makefile || true
 
-echo "===== FIND DEFCONFIG ====="
-find arch/arm64/configs -name "*peridot*"
+echo "===== SEARCH DEFCONFIG ====="
+find arch/arm64/configs -type f -name "*defconfig"
 
 echo "===== BUILD DEFCONFIG ====="
 make O=out ARCH=arm64 vendor/peridot_defconfig
