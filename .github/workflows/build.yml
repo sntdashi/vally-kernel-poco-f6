@@ -1,34 +1,34 @@
 name: Poco F6 HyperKernel
 
 on:
-workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
-build:
+  build:
 
-runs-on: ubuntu-latest  
+    runs-on: ubuntu-latest
 
-steps:  
+    steps:
 
-- name: Checkout  
-  uses: actions/checkout@v4  
+    - name: Checkout
+      uses: actions/checkout@v4
 
-- name: Install packages  
-  run: |  
-    sudo apt update  
-    sudo apt install -y bc bison build-essential flex git libssl-dev libelf-dev curl zip dos2unix  
+    - name: Install packages
+      run: |
+        sudo apt update
+        sudo apt install -y bc bison build-essential flex git libssl-dev libelf-dev curl zip dos2unix
 
-- name: Fix script format  
-  run: |  
-    dos2unix scripts/build.sh  
+    - name: Fix script format
+      run: |
+        dos2unix scripts/build.sh
 
-- name: Run build  
-  run: |  
-    chmod +x scripts/build.sh  
-    bash scripts/build.sh  
+    - name: Run build
+      run: |
+        chmod +x scripts/build.sh
+        bash scripts/build.sh
 
-- name: Upload kernel  
-  uses: actions/upload-artifact@v4  
-  with:  
-    name: PocoF6-HyperKernel  
-    path: AnyKernel/PocoF6-HyperKernel.zip
+    - name: Upload kernel
+      uses: actions/upload-artifact@v4
+      with:
+        name: PocoF6-HyperKernel
+        path: AnyKernel/PocoF6-HyperKernel.zip
