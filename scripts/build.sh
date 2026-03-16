@@ -17,8 +17,12 @@ git clone --depth=1 https://github.com/MiCode/Xiaomi_Kernel_OpenSource -b perido
 cd kernel
 
 echo "===== CLONE CLANG TOOLCHAIN ====="
-git clone --depth=1 https://github.com/Neutron-Toolchains/clang clang
+git clone --depth=1 https://github.com/ZyCromerZ/Clang clang
+
 export PATH="$(pwd)/clang/bin:$PATH"
+
+# hapus linker konflik
+rm -f clang/bin/ld || true
 
 echo "===== INJECT KERNELSU NEXT ====="
 git clone --depth=1 https://github.com/KernelSU-Next/KernelSU-Next ksu
