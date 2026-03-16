@@ -58,13 +58,10 @@ scripts/config --file out/.config \
 echo "===== UPDATE CONFIG ====="
 make O=out ARCH=arm64 olddefconfig
 
-echo "===== BUILD KERNEL ====="
 make -j$(nproc) O=out \
-CC=clang \
-LD=ld.lld \
-CLANG_TRIPLE=aarch64-linux-gnu- \
-CROSS_COMPILE=aarch64-linux-gnu- \
-KCFLAGS="-Wno-frame-larger-than=" \
+ARCH=arm64 \
+LLVM=1 \
+LLVM_IAS=1 \
 LOCALVERSION=$KERNEL_NAME
 
 cd ..
