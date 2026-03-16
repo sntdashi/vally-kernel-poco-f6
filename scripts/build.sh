@@ -71,12 +71,8 @@ cd ..
 echo "===== INSTALL MKBOOTIMG ====="
 sudo apt install -y android-sdk-libsparse-utils
 
-echo "===== PREPARE BOOT IMAGE ====="
-cp kernel/out/arch/arm64/boot/Image.gz boot-tools/
+echo "===== BUILD BOOT IMAGE ====="
 
-cd boot-tools
-
-echo "===== BUILD BOOT IMG ====="
 mkbootimg \
 --kernel kernel/out/arch/arm64/boot/Image.gz \
 --pagesize 4096 \
