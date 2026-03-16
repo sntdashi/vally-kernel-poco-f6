@@ -31,6 +31,7 @@ jobs:
 
     - name: Upload kernel
       uses: actions/upload-artifact@v4
-      with:
-        name: PocoF6-HyperKernel
-        path: AnyKernel/PocoF6-HyperKernel.zip
+      with:  
+       name: PocoF6-HyperKernel
+       path: PocoF6-HyperKernel.zip
+    
