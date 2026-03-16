@@ -68,8 +68,8 @@ KCFLAGS="-Wno-frame-larger-than"
 
 cd ..
 
-echo "===== DOWNLOAD BOOTIMG TOOLS ====="
-git clone https://github.com/osm0sis/mkbootimg boot-tools
+echo "===== INSTALL MKBOOTIMG ====="
+sudo apt install -y android-sdk-libsparse-utils
 
 echo "===== PREPARE BOOT IMAGE ====="
 cp kernel/out/arch/arm64/boot/Image.gz boot-tools/
@@ -77,12 +77,12 @@ cp kernel/out/arch/arm64/boot/Image.gz boot-tools/
 cd boot-tools
 
 echo "===== BUILD BOOT IMG ====="
-python3 mkbootimg.py \
---kernel Image.gz \
+mkbootimg \
+--kernel kernel/out/arch/arm64/boot/Image.gz \
 --pagesize 4096 \
 --base 0x00000000 \
 --cmdline "console=ttyMSM0,115200n8" \
---output boot.img
+-o boot.img
 
 cd ..
 
