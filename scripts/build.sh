@@ -29,16 +29,11 @@ git clone --depth=1 https://github.com/KernelSU-Next/KernelSU-Next ksu
 bash ksu/kernel/setup.sh
 
 echo "===== FIX XIAOMI SOURCE BUG ====="
-
-# hwid missing
 sed -i '/hwid\/Kconfig/d' drivers/misc/Kconfig || true
 sed -i '/hwid/d' drivers/misc/Makefile || true
 
-echo "===== SEARCH DEFCONFIG ====="
-find arch/arm64/configs -type f -name "*defconfig"
-
 echo "===== BUILD DEFCONFIG ====="
-make O=out ARCH=arm64 vendor/peridot_defconfig
+make O=out ARCH=arm64 gki_defconfig
 
 echo "===== ENABLE FEATURES ====="
 
@@ -58,14 +53,11 @@ scripts/config --file out/.config \
 -e BPF
 
 echo "===== BUILD KERNEL ====="
-
-make -j$(nproc --all) O=out \
-ARCH=arm64 \
+make -j$(nproc) O=out ARCH=arm64 \
 CC=clang \
-LLVM=1 \
-LLVM_IAS=1 \
-HOSTCC=gcc \
-HOSTCXX=g++
+LD=ld.lld \
+CLANG_TRIPLE=aarch64-linux-gnu- \
+CROSS_COMPILE=aarch64-linux-gnu-
 
 echo "===== COPY KERNEL ====="
 
