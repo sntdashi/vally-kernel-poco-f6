@@ -11,18 +11,16 @@ export KERNEL_NAME="-VallyKernel"
 export KBUILD_BUILD_USER="Rawzn"
 export KBUILD_BUILD_HOST="VallyLab"
 
+WORKDIR=$(pwd)
+
 echo "===== CLONE KERNEL SOURCE ====="
 git clone --depth=1 https://github.com/MiCode/Xiaomi_Kernel_OpenSource -b peridot-u-oss kernel
-
 cd kernel
 
 echo "===== CLONE CLANG TOOLCHAIN ====="
 git clone --depth=1 https://github.com/ZyCromerZ/Clang clang
-
-# aktifkan toolchain
 export CLANG_PATH="$(pwd)/clang"
 export PATH="$CLANG_PATH/bin:$PATH"
-# hapus linker konflik
 rm -f clang/bin/ld || true
 
 echo "===== INJECT KERNELSU NEXT ====="
@@ -59,6 +57,7 @@ scripts/config --file out/.config \
 echo "===== UPDATE CONFIG ====="
 make O=out ARCH=arm64 olddefconfig
 
+echo "===== BUILD KERNEL ====="
 make -j$(nproc) O=out \
 ARCH=arm64 \
 LLVM=1 \
@@ -66,16 +65,22 @@ LLVM_IAS=1 \
 LOCALVERSION=$KERNEL_NAME \
 KCFLAGS="-Wno-frame-larger-than"
 
-cd ..
+cd $WORKDIR
 
-echo "===== CLONE ANYKERNEL ====="
-git clone https://github.com/osm0sis/AnyKernel3 AnyKernel
+echo "===== CLONE ANYKERNEL3 ====="
+git clone --depth=1 https://github.com/osm0sis/AnyKernel3 AnyKernel
 
 echo "===== COPY KERNEL IMAGE ====="
-cp kernel/out/arch/arm64/boot/Image.gz AnyKernel/
+cp kernel/out/arch/arm64/boot/Image.gz AnyKernel/Image.gz
+
+echo "===== UPDATE ANYKERNEL.SH ====="
+# replace kernel string dan device check
+sed -i "s/kernel.string=.*/kernel.string=${KERNEL_NAME} by VallyLab @ xda-developers/" AnyKernel/anykernel.sh
+sed -i "s/do.devicecheck=.*/do.devicecheck=1/" AnyKernel/anykernel.sh
 
 echo "===== CREATE FLASHABLE ZIP ====="
 cd AnyKernel
-zip -r PocoF6-HyperKernel.zip *
+zip -r "../PocoF6-HyperKernel.zip" *
 
 echo "===== BUILD SUCCESS ====="
+echo "Zip ready: $WORKDIR/PocoF6-HyperKernel.zip"
