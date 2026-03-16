@@ -80,7 +80,8 @@ sed -i "s/do.devicecheck=.*/do.devicecheck=1/" AnyKernel/anykernel.sh
 
 echo "===== CREATE FLASHABLE ZIP ====="
 cd AnyKernel
-zip -r "../PocoF6-HyperKernel.zip" *
+zip -r ../PocoF6-HyperKernel.zip *
+cd ..
 
 echo "===== BUILD SUCCESS ====="
 echo "Zip ready: $WORKDIR/PocoF6-HyperKernel.zip"
