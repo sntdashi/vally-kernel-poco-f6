@@ -53,11 +53,12 @@ scripts/config --file out/.config \
 -e BPF
 
 echo "===== BUILD KERNEL ====="
-make -j$(nproc) O=out ARCH=arm64 \
+make -j$(nproc --all) O=out ARCH=arm64 \
 CC=clang \
 LD=ld.lld \
 CLANG_TRIPLE=aarch64-linux-gnu- \
-CROSS_COMPILE=aarch64-linux-gnu-
+CROSS_COMPILE=aarch64-linux-gnu- \
+KCFLAGS="-Wno-frame-larger-than="
 
 echo "===== COPY KERNEL ====="
 
