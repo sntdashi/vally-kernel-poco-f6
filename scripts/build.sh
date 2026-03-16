@@ -14,7 +14,10 @@ git clone --depth=1 https://github.com/MiCode/Xiaomi_Kernel_OpenSource -b perido
 echo "===== CLONE CLANG TOOLCHAIN ====="
 git clone --depth=1 https://github.com/kdrag0n/proton-clang clang
 
-export PATH="$WORKDIR/clang/bin:$PATH"
+echo "===== FIX TOOLCHAIN ====="
+rm -f clang/bin/ld
+
+export PATH="$PWD/clang/bin:$PATH"
 
 echo "===== CLONE ANYKERNEL ====="
 git clone --depth=1 https://github.com/osm0sis/AnyKernel3 AnyKernel
