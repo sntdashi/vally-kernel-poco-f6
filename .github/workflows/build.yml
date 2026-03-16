@@ -15,8 +15,10 @@ jobs:
 
     - name: Install packages
       run: |
-        sudo apt update
-        sudo apt install -y bc bison build-essential flex git libssl-dev libelf-dev curl zip dos2unix
+        sudo apt install -y \
+        bc bison build-essential flex git \
+        libssl-dev libelf-dev curl zip dos2unix \
+        clang lld llvm
 
     - name: Fix script format
       run: |
