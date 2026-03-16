@@ -35,6 +35,13 @@ sed -i '/hwid/d' drivers/misc/Makefile || true
 echo "===== BUILD DEFCONFIG ====="
 make O=out ARCH=arm64 gki_defconfig
 
+echo "===== DISABLE BTF ====="
+scripts/config --file out/.config -d CONFIG_DEBUG_INFO_BTF
+scripts/config --file out/.config -d CONFIG_DEBUG_INFO_BTF_MODULES
+
+echo "===== UPDATE CONFIG ====="
+make O=out ARCH=arm64 olddefconfig
+
 echo "===== ENABLE FEATURES ====="
 
 scripts/config --file out/.config \
@@ -53,7 +60,7 @@ scripts/config --file out/.config \
 -e BPF
 
 echo "===== BUILD KERNEL ====="
-make -j$(nproc --all) O=out ARCH=arm64 \
+make -j$(nproc) O=out ARCH=arm64 \
 CC=clang \
 LD=ld.lld \
 CLANG_TRIPLE=aarch64-linux-gnu- \
