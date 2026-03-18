@@ -80,7 +80,6 @@ echo "===== EXTRACT IMAGE ====="
 cp kernel/out/arch/arm64/boot/Image.gz ./Image.gz
 
 echo "===== PACK BOOT IMAGE ====="
-
 git clone --depth=1 https://github.com/osm0sis/mkbootimg_tools mkboot
 cd mkboot
 
