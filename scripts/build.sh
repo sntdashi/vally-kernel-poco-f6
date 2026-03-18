@@ -17,14 +17,18 @@ git clone --depth=1 https://github.com/ZyCromerZ/Clang clang
 export PATH="$(pwd)/clang/bin:$PATH"
 rm -f clang/bin/ld || true
 
-echo "===== FIX MISSING HWID ====="
-sed -i 's|source "drivers/misc/hwid/Kconfig"|# source "drivers/misc/hwid/Kconfig"|' drivers/misc/Kconfig || true
+echo "===== FORCE FIX HWID KCONFIG ====="
+
+# pastiin file ada
+if [ -f drivers/misc/Kconfig ]; then
+    sed -i '/hwid\/Kconfig/d' drivers/misc/Kconfig
+fi
 
 echo "===== DEFCONFIG ====="
 make O=out ARCH=arm64 gki_defconfig
 
 # ===============================
-# 🔥 PATCH DROIDSPACE FEATURES
+# =% PATCH DROIDSPACE FEATURES
 # ===============================
 echo "===== ENABLE REQUIRED FEATURES ====="
 
@@ -53,7 +57,7 @@ make -j$(nproc) O=out ARCH=arm64 LLVM=1 LLVM_IAS=1
 cd $WORKDIR
 
 # ===============================
-# 🔥 REPACK BOOT (A16 BASE)
+# =% REPACK BOOT (A16 BASE)
 # ===============================
 echo "===== UNPACK STOCK BOOT ====="
 
