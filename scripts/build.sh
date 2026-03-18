@@ -81,12 +81,13 @@ cp kernel/out/arch/arm64/boot/Image.gz ./Image.gz
 
 echo "===== PACK BOOT IMAGE ====="
 
-wget https://github.com/osm0sis/mkbootimg_tools/archive/refs/heads/master.zip -O mkboot.zip
+wget https://github.com/osm0sis/mkbootimg_tools/archive/refs/heads/main.zip -O mkboot.zip
 
 unzip mkboot.zip
 mv mkbootimg_tools-* mkboot
 
 cd mkboot
+
 # unpack boot.img dari repo lo
 ./unpack_bootimg.py ../boot.img
 
