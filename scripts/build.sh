@@ -81,8 +81,7 @@ cp kernel/out/arch/arm64/boot/Image.gz ./Image.gz
 
 echo "===== PACK BOOT IMAGE ====="
 
-# install tool
-git clone https://github.com/osm0sis/mkbootimg_tools mkboot
+git clone --depth=1 https://github.com/osm0sis/mkbootimg_tools mkboot
 cd mkboot
 
 # unpack boot.img dari repo lo
