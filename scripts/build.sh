@@ -17,6 +17,9 @@ git clone --depth=1 https://github.com/ZyCromerZ/Clang clang
 export PATH="$(pwd)/clang/bin:$PATH"
 rm -f clang/bin/ld || true
 
+echo "===== FIX MISSING HWID ====="
+sed -i 's|source "drivers/misc/hwid/Kconfig"|# source "drivers/misc/hwid/Kconfig"|' drivers/misc/Kconfig || true
+
 echo "===== DEFCONFIG ====="
 make O=out ARCH=arm64 gki_defconfig
 
