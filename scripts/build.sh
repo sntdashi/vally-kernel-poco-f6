@@ -76,7 +76,6 @@ KCFLAGS="-Wno-error -Wno-frame-larger-than"
 
 cd $WORKDIR
 
-<<<<<<< HEAD
 echo "===== PACK BOOT IMAGE ====="
 
 wget https://github.com/osm0sis/mkbootimg_tools/archive/refs/heads/main.zip -O mkboot.zip
