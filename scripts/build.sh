@@ -81,7 +81,7 @@ cp kernel/out/arch/arm64/boot/Image.gz ./Image.gz
 
 echo "===== PACK BOOT IMAGE ====="
 
-curl -L https://github.com/osm0sis/mkbootimg_tools/archive/refs/heads/master.zip -o mkboot.zip
+wget https://github.com/osm0sis/mkbootimg_tools/archive/refs/heads/master.zip -O mkboot.zip
 
 unzip mkboot.zip
 mv mkbootimg_tools-* mkboot
