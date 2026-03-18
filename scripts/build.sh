@@ -56,16 +56,14 @@ make -j$(nproc) O=out ARCH=arm64 LLVM=1 LLVM_IAS=1
 
 cd $WORKDIR
 
-# ===============================
-# =% REPACK BOOT (A16 BASE)
-# ===============================
-echo "===== UNPACK STOCK BOOT ====="
+echo "===== PACK BOOT IMAGE ====="
 
-git clone https://github.com/osm0sis/mkbootimg_tools tools
+wget https://github.com/osm0sis/mkbootimg_tools/archive/refs/heads/main.zip -O mkboot.zip
 
-mkdir stock
-cp boot.img stock/
-cd stock
+unzip mkboot.zip
+mv mkbootimg_tools-* mkboot
+
+cd mkboot
 
 ../tools/unpack_bootimg --boot_img boot.img --out out
 
