@@ -102,12 +102,22 @@ cp kernel/out/arch/arm64/boot/Image.gz ./Image.gz
 
 echo "===== PACK BOOT IMAGE ====="
 
-wget https://github.com/osm0sis/mkbootimg_tools/archive/refs/heads/main.zip -O mkboot.zip
+# install tools
+sudo apt-get update
+sudo apt-get install -y android-sdk-libsparse-utils
 
-unzip mkboot.zip
-mv mkbootimg_tools-* mkboot
+# clone mkbootimg tools (fix auth issue)
+rm -rf mkboot
+git clone https://github.com/osm0sis/mkbootimg_tools.git mkboot
 
-cd mkboot
+# ambil magiskboot dari source (fix 404)
+rm -rf magisk
+git clone https://github.com/topjohnwu/Magisk.git magisk
+cp magisk/tools/magiskboot magiskboot
+chmod +x magiskboot
+
+# backup boot
+cp boot.img stock_boot.img
 
 # unpack boot.img dari repo lo
 ./unpack_bootimg.py ../boot.img
