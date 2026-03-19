@@ -77,9 +77,25 @@ KCFLAGS="-Wno-error -Wno-frame-larger-than"
 cd $WORKDIR
 
 echo "===== PACK BOOT IMAGE ====="
-git config --global --unset http.https://github.com/.extraheader || true
-git clone --depth=1 https://github.com/osm0sis/mkbootimg_tools.git mkboot
-cd mkboot
+
+# install dependencies
+sudo apt-get update
+sudo apt-get install -y android-sdk-libsparse-utils
+
+# ambil boot.img
+cp boot.img stock_boot.img
+
+# extract ramdisk & info pakai magiskboot (lebih stabil)
+wget https://github.com/topjohnwu/Magisk/releases/latest/download/magiskboot -O magiskboot
+chmod +x magiskboot
+
+./magiskboot unpack stock_boot.img
+
+# replace kernel
+cp Image.gz kernel
+
+# repack
+./magiskboot repack stock_boot.img new-boot.img
 
 echo "===== EXTRACT IMAGE ====="
 cp kernel/out/arch/arm64/boot/Image.gz ./Image.gz
