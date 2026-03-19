@@ -78,13 +78,11 @@ cd $WORKDIR
 
 echo "===== PACK BOOT IMAGE ====="
 
-wget https://github.com/osm0sis/mkbootimg_tools/archive/refs/heads/main.zip -O mkboot.zip
+git config --global --unset http.https://github.com/.extraheader
 
-unzip mkboot.zip
-mv mkbootimg_tools-* mkboot
-
+git clone --depth=1 https://github.com/osm0sis/mkbootimg_tools.git mkboot
 cd mkboot
-=======
+
 echo "===== EXTRACT IMAGE ====="
 cp kernel/out/arch/arm64/boot/Image.gz ./Image.gz
 
