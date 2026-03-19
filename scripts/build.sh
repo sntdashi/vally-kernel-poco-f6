@@ -109,6 +109,7 @@ sudo apt-get install -y android-sdk-libsparse-utils
 # clone mkbootimg tools (fix auth issue)
 rm -rf mkboot
 # Gunakan link alternatif untuk magiskboot
+# Unduh magiskboot yang valid
 wget https://github.com/itachi-0100/Magisk/releases/download/v30.7/magiskboot -O magiskboot
 
 # ambil magiskboot dari source (fix 404)
