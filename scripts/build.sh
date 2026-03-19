@@ -77,9 +77,7 @@ KCFLAGS="-Wno-error -Wno-frame-larger-than"
 cd $WORKDIR
 
 echo "===== PACK BOOT IMAGE ====="
-
-git config --global --unset http.https://github.com/.extraheader
-
+git config --global --unset http.https://github.com/.extraheader || true
 git clone --depth=1 https://github.com/osm0sis/mkbootimg_tools.git mkboot
 cd mkboot
 
