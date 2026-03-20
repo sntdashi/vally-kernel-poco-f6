@@ -17,9 +17,6 @@ echo "===== CLONE KERNEL SOURCE ====="
 git clone --depth=1 https://github.com/MiCode/Xiaomi_Kernel_OpenSource -b peridot-u-oss kernel
 cd kernel
 
-echo "===== FIX MISSING HWID ====="
-sed -i '/hwid\/Kconfig/d' drivers/misc/Kconfig || true
-
 echo "===== CLONE CLANG TOOLCHAIN ====="
 git clone --depth=1 https://github.com/ZyCromerZ/Clang clang
 export CLANG_PATH="$(pwd)/clang"
@@ -30,38 +27,39 @@ echo "===== INJECT KERNELSU NEXT ====="
 git clone --depth=1 https://github.com/KernelSU-Next/KernelSU-Next ksu
 bash ksu/kernel/setup.sh
 
+echo "===== FIX XIAOMI SOURCE BUG ====="
+sed -i '/hwid\/Kconfig/d' drivers/misc/Kconfig || true
+sed -i '/hwid/d' drivers/misc/Makefile || true
+
 echo "===== BUILD DEFCONFIG ====="
 make O=out ARCH=arm64 gki_defconfig
 
-echo "===== FIX CONFIG (ANTI ERROR) ====="
+echo "===== DISABLE BTF ====="
+scripts/config --file out/.config -d CONFIG_DEBUG_INFO_BTF
+scripts/config --file out/.config -d CONFIG_DEBUG_INFO_BTF_MODULES
 
-# disable problematic debug
+echo "===== ENABLE NECESSARY FEATURES FOR DROIDSPACES ====="
 scripts/config --file out/.config \
--d CONFIG_DEBUG_INFO_BTF \
--d CONFIG_DEBUG_INFO_BTF_MODULES
+-e CONFIG_PID_NS \
+-e CONFIG_IPC_NS \
+-e CONFIG_DEVTMPFS \
+-e CONFIG_CGROUP_DEVICE
 
-# fix stack frame error
+echo "===== ENABLE ADDITIONAL FEATURES ====="
 scripts/config --file out/.config \
---set-val CONFIG_FRAME_WARN 4096
-
-# disable problematic features
-scripts/config --file out/.config \
--d CONFIG_BPF \
--d CONFIG_USB_GADGET \
--d CONFIG_USB_CONFIGFS
-
-# enable fitur penting
-scripts/config --file out/.config \
--e CONFIG_KSU \
--e CONFIG_KVM \
--e CONFIG_VIRTUALIZATION \
--e CONFIG_VHOST_NET \
--e CONFIG_VSOCKETS \
--e CONFIG_VIRTIO \
--e CONFIG_OVERLAY_FS \
--e CONFIG_TMPFS_XATTR \
--e CONFIG_ANDROID_BINDERFS \
--e CONFIG_WIREGUARD
+-e KVM \
+-e KVM_ARM_HOST \
+-e KVM_ARM_VGIC \
+-e KVM_ARM_TIMER \
+-e VIRTUALIZATION \
+-e VHOST_NET \
+-e VSOCKETS \
+-e VIRTIO \
+-e OVERLAY_FS \
+-e TMPFS_XATTR \
+-e ANDROID_BINDERFS \
+-e WIREGUARD \
+-e BPF
 
 echo "===== UPDATE CONFIG ====="
 make O=out ARCH=arm64 olddefconfig
@@ -72,72 +70,24 @@ ARCH=arm64 \
 LLVM=1 \
 LLVM_IAS=1 \
 LOCALVERSION=$KERNEL_NAME \
-KCFLAGS="-Wno-error -Wno-frame-larger-than"
+KCFLAGS="-Wno-frame-larger-than"
 
 cd $WORKDIR
 
-echo "===== PACK BOOT IMAGE ====="
+echo "===== CLONE ANYKERNEL3 ====="
+git clone --depth=1 https://github.com/osm0sis/AnyKernel3 AnyKernel
 
-# install dependencies
-sudo apt-get update
-sudo apt-get install -y android-sdk-libsparse-utils
+echo "===== COPY KERNEL IMAGE ====="
+cp kernel/out/arch/arm64/boot/Image.gz AnyKernel/Image.gz
 
-# ambil boot.img
-cp boot.img stock_boot.img
+echo "===== UPDATE ANYKERNEL.SH ====="
+# Replace kernel string and device check
+sed -i "s/kernel.string=.*/kernel.string=${KERNEL_NAME} by VallyLab @ xda-developers/" AnyKernel/anykernel.sh
+sed -i "s/do.devicecheck=.*/do.devicecheck=1/" AnyKernel/anykernel.sh
 
-# extract ramdisk & info pakai magiskboot (lebih stabil)
-wget https://github.com/topjohnwu/Magisk/releases/latest/download/magiskboot -O magiskboot
-chmod +x magiskboot
+echo "===== CREATE FLASHABLE ZIP ====="
+cd AnyKernel
+zip -r "../PocoF6-HyperKernel.zip" *
 
-./magiskboot unpack stock_boot.img
-
-# replace kernel
-cp Image.gz kernel
-
-# repack
-./magiskboot repack stock_boot.img new-boot.img
-
-echo "===== EXTRACT IMAGE ====="
-cp kernel/out/arch/arm64/boot/Image.gz ./Image.gz
-
-echo "===== PACK BOOT IMAGE ====="
-
-# install tools
-sudo apt-get update
-sudo apt-get install -y android-sdk-libsparse-utils
-
-# clone mkbootimg tools (fix auth issue)
-rm -rf mkboot
-# Gunakan link alternatif untuk magiskboot
-# Unduh magiskboot yang valid
-wget https://github.com/itachi-0100/Magisk/releases/download/v30.7/magiskboot -O magiskboot
-
-# ambil magiskboot dari source (fix 404)
-rm -rf magisk
-git clone https://github.com/topjohnwu/Magisk.git magisk
-cp magisk/tools/magiskboot magiskboot
-chmod +x magiskboot
-
-# backup boot
-cp boot.img stock_boot.img
-
-# unpack boot.img dari repo lo
-./unpack_bootimg.py ../boot.img
-
-# replace kernel
-cp ../Image.gz kernel
-
-# repack
-./mkbootimg.py \
---kernel kernel \
---ramdisk ramdisk \
---dtb dtb \
---cmdline "$(cat cmdline)" \
---base $(cat base) \
---pagesize $(cat pagesize) \
---output ../new-boot.img
-
-cd ..
-
-echo "===== DONE ====="
-echo "OUTPUT: new-boot.img"
+echo "===== BUILD SUCCESS ====="
+echo "Zip ready: $WORKDIR/PocoF6-HyperKernel.zip"
