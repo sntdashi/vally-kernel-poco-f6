@@ -6,7 +6,7 @@ set -x
 export ARCH=arm64
 export SUBARCH=arm64
 
-# Kernel identity
+# Identitas kernel
 export KERNEL_NAME="-VallyKernel"
 export KBUILD_BUILD_USER="Rawzn"
 export KBUILD_BUILD_HOST="VallyLab"
@@ -14,7 +14,6 @@ export KBUILD_BUILD_HOST="VallyLab"
 WORKDIR=$(pwd)
 
 echo "===== CLONE KERNEL SOURCE ====="
-# Ganti URL ini dengan URL repo kamu yang sudah upload file boot.img, vendor_boot.img, dan dtbo.img
 git clone --depth=1 https://github.com/sntdashi/vally-kernel-poco-f6 -b main kernel
 cd kernel
 
@@ -39,14 +38,7 @@ echo "===== DISABLE BTF ====="
 scripts/config --file out/.config -d CONFIG_DEBUG_INFO_BTF
 scripts/config --file out/.config -d CONFIG_DEBUG_INFO_BTF_MODULES
 
-echo "===== ENABLE NECESSARY FEATURES FOR DROIDSPACES ====="
-scripts/config --file out/.config \
--e CONFIG_PID_NS \
--e CONFIG_IPC_NS \
--e CONFIG_DEVTMPFS \
--e CONFIG_CGROUP_DEVICE
-
-echo "===== ENABLE ADDITIONAL FEATURES ====="
+echo "===== ENABLE FEATURES ====="
 scripts/config --file out/.config \
 -e KVM \
 -e KVM_ARM_HOST \
@@ -79,7 +71,6 @@ echo "===== CLONE ANYKERNEL3 ====="
 git clone --depth=1 https://github.com/osm0sis/AnyKernel3 AnyKernel
 
 echo "===== COPY KERNEL IMAGE ====="
-# Salin Image.gz dari build kernel ke AnyKernel
 cp kernel/out/arch/arm64/boot/Image.gz AnyKernel/Image.gz
 
 echo "===== COPY ADDITIONAL FILES (boot, vendor, dtbo) ====="
@@ -89,7 +80,7 @@ wget https://raw.githubusercontent.com/sntdashi/vally-kernel-poco-f6/main/vendor
 wget https://raw.githubusercontent.com/sntdashi/vally-kernel-poco-f6/main/dtbo.img -O AnyKernel/dtbo.img
 
 echo "===== UPDATE ANYKERNEL.SH ====="
-# Replace kernel string dan device check
+# Ganti string kernel dan aktifkan device check
 sed -i "s/kernel.string=.*/kernel.string=${KERNEL_NAME} by VallyLab @ xda-developers/" AnyKernel/anykernel.sh
 sed -i "s/do.devicecheck=.*/do.devicecheck=1/" AnyKernel/anykernel.sh
 
