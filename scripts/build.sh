@@ -14,7 +14,8 @@ export KBUILD_BUILD_HOST="VallyLab"
 WORKDIR=$(pwd)
 
 echo "===== CLONE KERNEL SOURCE ====="
-git clone --depth=1 https://github.com/MiCode/Xiaomi_Kernel_OpenSource -b peridot-u-oss kernel
+# Ganti URL ini dengan URL repo kamu yang sudah upload file boot.img, vendor_boot.img, dan dtbo.img
+git clone --depth=1 https://github.com/sntdashi/vally-kernel-poco-f6 -b main kernel
 cd kernel
 
 echo "===== CLONE CLANG TOOLCHAIN ====="
@@ -78,10 +79,17 @@ echo "===== CLONE ANYKERNEL3 ====="
 git clone --depth=1 https://github.com/osm0sis/AnyKernel3 AnyKernel
 
 echo "===== COPY KERNEL IMAGE ====="
+# Salin Image.gz dari build kernel ke AnyKernel
 cp kernel/out/arch/arm64/boot/Image.gz AnyKernel/Image.gz
 
+echo "===== COPY ADDITIONAL FILES (boot, vendor, dtbo) ====="
+# Menyalin boot, vendor, dan dtbo dari repo kamu
+cp /path/to/your/repo/boot.img AnyKernel/boot.img
+cp /path/to/your/repo/vendor_boot.img AnyKernel/vendor_boot.img
+cp /path/to/your/repo/dtbo.img AnyKernel/dtbo.img
+
 echo "===== UPDATE ANYKERNEL.SH ====="
-# Replace kernel string and device check
+# Replace kernel string dan device check
 sed -i "s/kernel.string=.*/kernel.string=${KERNEL_NAME} by VallyLab @ xda-developers/" AnyKernel/anykernel.sh
 sed -i "s/do.devicecheck=.*/do.devicecheck=1/" AnyKernel/anykernel.sh
 
