@@ -86,9 +86,9 @@ cp kernel/out/arch/arm64/boot/Image.gz AnyKernel/Image.gz
 
 echo "===== COPY ADDITIONAL FILES (boot, vendor, dtbo) ====="
 # Menyalin boot, vendor, dan dtbo dari repo kamu ke AnyKernel
-cp https://github.com/sntdashi/vally-kernel-poco-f6/main/boot.img AnyKernel/boot.img
-cp https://github.com/sntdashi/vally-kernel-poco-f6/main/vendor_boot.img AnyKernel/vendor_boot.img
-cp https://github.com/sntdashi/vally-kernel-poco-f6/main/dtbo.img AnyKernel/dtbo.img
+cp https://github.com/sntdashi/vally-kernel-poco-f6/boot.img AnyKernel/boot.img
+cp https://github.com/sntdashi/vally-kernel-poco-f6/vendor_boot.img AnyKernel/vendor_boot.img
+cp https://github.com/sntdashi/vally-kernel-poco-f6/dtbo.img AnyKernel/dtbo.img
 
 echo "===== UPDATE ANYKERNEL.SH ====="
 # Memperbarui kernel string dan device check di AnyKernel
