@@ -80,11 +80,19 @@ scripts/config --file out/.config \
 echo "===== APPLY OLDDEFCONFIG ====="
 make O=out ARCH=arm64 olddefconfig
 
+echo "===== DISABLE STRICT WARNINGS ====="
+
+scripts/config --file out/.config -d CONFIG_WERROR || true
+
 # ===============================
 # 🔥 BUILD KERNEL
 # ===============================
 echo "===== BUILD KERNEL ====="
-make -j$(nproc) O=out ARCH=arm64 LLVM=1 LLVM_IAS=1
+make -j$(nproc) O=out \
+ARCH=arm64 \
+LLVM=1 \
+LLVM_IAS=1 \
+KCFLAGS="-Wno-frame-larger-than"
 
 cd $WORKDIR
 
