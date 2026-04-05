@@ -116,24 +116,26 @@ wget -O boot.img https://raw.githubusercontent.com/sntdashi/vally-kernel-poco-f6
 # 🔥 UNPACK
 # ===============================
 echo "===== UNPACK STOCK BOOT ====="
-echo "===== DOWNLOAD MKBOOTIMG TOOLS ====="
+echo "===== SETUP MKBOOTIMG (AOSP) ====="
 
-wget https://github.com/osm0sis/mkbootimg_tools/archive/refs/heads/main.zip
-unzip main.zip
-mv mkbootimg_tools-main tools
+git clone --depth=1 https://android.googlesource.com/platform/system/tools/mkbootimg mkbootimg_tools
+
+cd mkbootimg_tools
+chmod +x mkbootimg.py unpack_bootimg.py
+cd ..
 
 mkdir stock
 mv boot.img stock/
 cd stock
 
-../tools/unpack_bootimg --boot_img boot.img --out out
+python3 mkbootimg_tools/unpack_bootimg.py --boot_img boot.img --out out
 
 # ===============================
 # 🔥 REPACK (ANTI BOOTLOOP)
 # ===============================
 echo "===== REPACK NEW BOOT ====="
 
-../tools/mkbootimg \
+python3 mkbootimg_tools/mkbootimg.py \
 --kernel ../kernel/out/arch/arm64/boot/Image.gz \
 --ramdisk out/ramdisk \
 --cmdline "$(cat out/cmdline)" \
