@@ -17,13 +17,38 @@ git clone --depth=1 https://github.com/ZyCromerZ/Clang clang
 export PATH="$(pwd)/clang/bin:$PATH"
 rm -f clang/bin/ld || true
 
+# ===============================
+# 🔥 FIX HWID ERROR (WAJIB)
+# ===============================
+echo "===== FIX HWID ====="
+
+sed -i '/hwid/d' drivers/misc/Kconfig || true
+sed -i '/hwid/d' drivers/misc/Makefile || true
+
+mkdir -p drivers/misc/hwid
+
+cat <<EOF > drivers/misc/hwid/Kconfig
+config HWID_DUMMY
+    bool "Dummy HWID"
+    default n
+EOF
+
+cat <<EOF > drivers/misc/hwid/Makefile
+obj-\$(CONFIG_HWID_DUMMY) += dummy.o
+EOF
+
+touch drivers/misc/hwid/dummy.c
+
+# ===============================
+# 🔥 DEFCONFIG
+# ===============================
 echo "===== DEFCONFIG ====="
 make O=out ARCH=arm64 gki_defconfig
 
 # ===============================
-# 🔥 PATCH DROIDSPACE FEATURES
+# 🔥 DROIDSPACE FULL SUPPORT
 # ===============================
-echo "===== ENABLE REQUIRED FEATURES ====="
+echo "===== ENABLE DROIDSPACE FEATURES ====="
 
 scripts/config --file out/.config \
 -e NAMESPACES \
@@ -31,6 +56,7 @@ scripts/config --file out/.config \
 -e IPC_NS \
 -e UTS_NS \
 -e NET_NS \
+-e USER_NS \
 -e DEVPTS_MULTIPLE_INSTANCES \
 -e DEVTMPFS \
 -e DEVTMPFS_MOUNT \
@@ -39,30 +65,53 @@ scripts/config --file out/.config \
 -e CGROUP_PIDS \
 -e CGROUP_FREEZER \
 -e CGROUP_SCHED \
--e CGROUP_CPUACCT
+-e CGROUP_CPUACCT \
+-e CGROUP_BPF \
+-e CGROUP_MISC \
+-e CGROUP_NET_PRIO \
+-e CGROUP_NET_CLASSID \
+-e CGROUP_HUGETLB \
+-e MEMCG \
+-e BLK_CGROUP \
+-e CFS_BANDWIDTH \
+-e FAIR_GROUP_SCHED \
+-e RT_GROUP_SCHED
 
 echo "===== APPLY OLDDEFCONFIG ====="
 make O=out ARCH=arm64 olddefconfig
 
+# ===============================
+# 🔥 BUILD KERNEL
+# ===============================
 echo "===== BUILD KERNEL ====="
 make -j$(nproc) O=out ARCH=arm64 LLVM=1 LLVM_IAS=1
 
 cd $WORKDIR
 
 # ===============================
-# 🔥 REPACK BOOT (A16 BASE)
+# 🔥 AMBIL BOOT DARI REPO LU
+# ===============================
+echo "===== GET STOCK BOOT (A16) ====="
+
+wget https://raw.githubusercontent.com/sntdashi/vally-kernel-poco-f6/main/boot.img
+
+# ===============================
+# 🔥 UNPACK
 # ===============================
 echo "===== UNPACK STOCK BOOT ====="
 
 git clone https://github.com/osm0sis/mkbootimg_tools tools
 
 mkdir stock
-cp boot.img stock/
+mv boot.img stock/
 cd stock
 
 ../tools/unpack_bootimg --boot_img boot.img --out out
 
-echo "===== REPACK WITH NEW KERNEL ====="
+# ===============================
+# 🔥 REPACK (ANTI BOOTLOOP)
+# ===============================
+echo "===== REPACK NEW BOOT ====="
 
 ../tools/mkbootimg \
 --kernel ../kernel/out/arch/arm64/boot/Image.gz \
@@ -70,6 +119,9 @@ echo "===== REPACK WITH NEW KERNEL ====="
 --cmdline "$(cat out/cmdline)" \
 --base $(cat out/base) \
 --pagesize $(cat out/pagesize) \
+--os_version 16.0.0 \
+--os_patch_level 2024-01 \
+--header_version 4 \
 --output ../new-boot.img
 
 cd ..
@@ -77,4 +129,4 @@ cd ..
 echo "===== SHA256 ====="
 sha256sum new-boot.img
 
-echo "===== DONE BUILD ====="
+echo "===== BUILD DONE BRO 🔥 ====="
