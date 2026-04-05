@@ -116,8 +116,11 @@ wget -O boot.img https://raw.githubusercontent.com/sntdashi/vally-kernel-poco-f6
 # 🔥 UNPACK
 # ===============================
 echo "===== UNPACK STOCK BOOT ====="
+echo "===== DOWNLOAD MKBOOTIMG TOOLS ====="
 
-git clone --depth=1 https://github.com/osm0sis/mkbootimg_tools.git tools
+wget https://github.com/osm0sis/mkbootimg_tools/archive/refs/heads/master.zip
+unzip master.zip
+mv mkbootimg_tools-master tools
 
 mkdir stock
 mv boot.img stock/
