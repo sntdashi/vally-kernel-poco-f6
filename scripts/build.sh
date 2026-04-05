@@ -3,25 +3,36 @@
 set -e
 set -x
 
+# ===============================
+# 🔥 GLOBAL SETUP
+# ===============================
 export ARCH=arm64
 export SUBARCH=arm64
 export GIT_TERMINAL_PROMPT=0
+
 git config --global advice.detachedHead false
 git config --global --add safe.directory '*'
 
 WORKDIR=$(pwd)
+MKBOOTIMG=$WORKDIR/mkbootimg_tools
 
+# ===============================
+# 🔥 CLONE KERNEL
+# ===============================
 echo "===== CLONE KERNEL SOURCE ====="
 git clone --depth=1 https://github.com/MiCode/Xiaomi_Kernel_OpenSource -b peridot-u-oss kernel
 cd kernel
 
+# ===============================
+# 🔥 SETUP CLANG
+# ===============================
 echo "===== SETUP CLANG ====="
 git clone --depth=1 https://github.com/ZyCromerZ/Clang clang
 export PATH="$(pwd)/clang/bin:$PATH"
 rm -f clang/bin/ld || true
 
 # ===============================
-# 🔥 FIX HWID ERROR (WAJIB)
+# 🔥 FIX HWID
 # ===============================
 echo "===== FIX HWID ====="
 
@@ -46,10 +57,10 @@ touch drivers/misc/hwid/dummy.c
 # 🔥 DEFCONFIG
 # ===============================
 echo "===== DEFCONFIG ====="
-make O=out ARCH=arm64 gki_defconfig
+make O=out gki_defconfig
 
 # ===============================
-# 🔥 DROIDSPACE FULL SUPPORT
+# 🔥 ENABLE DROIDSPACE
 # ===============================
 echo "===== ENABLE DROIDSPACE FEATURES ====="
 
@@ -80,25 +91,25 @@ scripts/config --file out/.config \
 -e FAIR_GROUP_SCHED \
 -e RT_GROUP_SCHED
 
-echo "===== DISABLE BTF ====="
+# ===============================
+# 🔥 DISABLE BTF & STRICT
+# ===============================
+echo "===== DISABLE DEBUG & STRICT ====="
 
 scripts/config --file out/.config -d CONFIG_DEBUG_INFO_BTF
 scripts/config --file out/.config -d CONFIG_DEBUG_INFO_BTF_MODULES
 scripts/config --file out/.config -d CONFIG_PAHOLE_HAS_SPLIT_BTF
-
-echo "===== APPLY OLDDEFCONFIG ====="
-make O=out ARCH=arm64 olddefconfig
-
-echo "===== DISABLE STRICT WARNINGS ====="
-
 scripts/config --file out/.config -d CONFIG_WERROR || true
 
+# APPLY CONFIG
+echo "===== APPLY OLDDEFCONFIG ====="
+make O=out olddefconfig
+
 # ===============================
-# 🔥 BUILD KERNEL
+# 🔥 BUILD
 # ===============================
 echo "===== BUILD KERNEL ====="
 make -j$(nproc) O=out \
-ARCH=arm64 \
 LLVM=1 \
 LLVM_IAS=1 \
 KCFLAGS="-Wno-frame-larger-than"
@@ -106,37 +117,39 @@ KCFLAGS="-Wno-frame-larger-than"
 cd $WORKDIR
 
 # ===============================
-# 🔥 AMBIL BOOT DARI REPO LU
+# 🔥 DOWNLOAD BOOT IMG
 # ===============================
-echo "===== GET STOCK BOOT (A16) ====="
+echo "===== GET STOCK BOOT ====="
 
 wget -O boot.img https://raw.githubusercontent.com/sntdashi/vally-kernel-poco-f6/main/boot.img
 
 # ===============================
-# 🔥 UNPACK
+# 🔥 SETUP MKBOOTIMG (AOSP)
 # ===============================
-echo "===== UNPACK STOCK BOOT ====="
-echo "===== SETUP MKBOOTIMG (AOSP) ====="
+echo "===== SETUP MKBOOTIMG ====="
 
 git clone --depth=1 https://android.googlesource.com/platform/system/tools/mkbootimg mkbootimg_tools
 
-cd mkbootimg_tools
-chmod +x mkbootimg.py unpack_bootimg.py
-cd ..
+chmod +x $MKBOOTIMG/*.py
+
+# ===============================
+# 🔥 UNPACK
+# ===============================
+echo "===== UNPACK BOOT ====="
 
 mkdir stock
 mv boot.img stock/
 cd stock
 
-python3 mkbootimg_tools/unpack_bootimg.py --boot_img boot.img --out out
+python3 $MKBOOTIMG/unpack_bootimg.py --boot_img boot.img --out out
 
 # ===============================
-# 🔥 REPACK (ANTI BOOTLOOP)
+# 🔥 REPACK
 # ===============================
-echo "===== REPACK NEW BOOT ====="
+echo "===== REPACK BOOT ====="
 
-python3 mkbootimg_tools/mkbootimg.py \
---kernel ../kernel/out/arch/arm64/boot/Image.gz \
+python3 $MKBOOTIMG/mkbootimg.py \
+--kernel $WORKDIR/kernel/out/arch/arm64/boot/Image.gz \
 --ramdisk out/ramdisk \
 --cmdline "$(cat out/cmdline)" \
 --base $(cat out/base) \
@@ -144,11 +157,14 @@ python3 mkbootimg_tools/mkbootimg.py \
 --os_version 16.0.0 \
 --os_patch_level 2024-01 \
 --header_version 4 \
---output ../new-boot.img
+--output $WORKDIR/new-boot.img
 
-cd ..
+cd $WORKDIR
 
+# ===============================
+# 🔥 FINAL
+# ===============================
 echo "===== SHA256 ====="
 sha256sum new-boot.img
 
-echo "===== BUILD DONE BRO 🔥 ====="
+echo "===== DONE 🔥 KERNEL SIAP DI FLASH ====="
