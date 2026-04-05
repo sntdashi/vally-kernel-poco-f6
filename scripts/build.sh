@@ -5,6 +5,7 @@ set -x
 
 export ARCH=arm64
 export SUBARCH=arm64
+export GIT_TERMINAL_PROMPT=0
 
 WORKDIR=$(pwd)
 
