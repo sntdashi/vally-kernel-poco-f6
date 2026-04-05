@@ -77,6 +77,12 @@ scripts/config --file out/.config \
 -e FAIR_GROUP_SCHED \
 -e RT_GROUP_SCHED
 
+echo "===== DISABLE BTF ====="
+
+scripts/config --file out/.config -d CONFIG_DEBUG_INFO_BTF
+scripts/config --file out/.config -d CONFIG_DEBUG_INFO_BTF_MODULES
+scripts/config --file out/.config -d CONFIG_PAHOLE_HAS_SPLIT_BTF
+
 echo "===== APPLY OLDDEFCONFIG ====="
 make O=out ARCH=arm64 olddefconfig
 
