@@ -6,6 +6,8 @@ set -x
 export ARCH=arm64
 export SUBARCH=arm64
 export GIT_TERMINAL_PROMPT=0
+git config --global advice.detachedHead false
+git config --global --add safe.directory '*'
 
 WORKDIR=$(pwd)
 
@@ -108,14 +110,14 @@ cd $WORKDIR
 # ===============================
 echo "===== GET STOCK BOOT (A16) ====="
 
-wget https://raw.githubusercontent.com/sntdashi/vally-kernel-poco-f6/main/boot.img
+wget -O boot.img https://raw.githubusercontent.com/sntdashi/vally-kernel-poco-f6/main/boot.img
 
 # ===============================
 # 🔥 UNPACK
 # ===============================
 echo "===== UNPACK STOCK BOOT ====="
 
-git clone https://github.com/osm0sis/mkbootimg_tools tools
+git clone --depth=1 https://github.com/osm0sis/mkbootimg_tools.git tools
 
 mkdir stock
 mv boot.img stock/
