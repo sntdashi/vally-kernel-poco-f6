@@ -164,4 +164,16 @@ cd $WORKDIR
 echo "===== SHA256 ====="
 sha256sum new-boot.img
 
+echo "===== PACK ZIP ====="
+
+mkdir -p AnyKernel
+
+cp new-boot.img AnyKernel/boot.img
+
+cd AnyKernel
+
+zip -r ../PocoF6-HyperKernel.zip *
+
+cd ..
+
 echo "===== DONE 🔥 KERNEL SIAP DI FLASH ====="
