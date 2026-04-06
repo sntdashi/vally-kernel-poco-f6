@@ -150,13 +150,10 @@ echo "===== REPACK BOOT ====="
 
 python3 $MKBOOTIMG/mkbootimg.py \
 --kernel $WORKDIR/kernel/out/arch/arm64/boot/Image.gz \
---ramdisk out/ramdisk \
---cmdline "$(cat out/cmdline)" \
---base $(cat out/base) \
---pagesize $(cat out/pagesize) \
+--header_version 4 \
+--pagesize 4096 \
 --os_version 16.0.0 \
 --os_patch_level 2024-01 \
---header_version 4 \
 --output $WORKDIR/new-boot.img
 
 cd $WORKDIR
